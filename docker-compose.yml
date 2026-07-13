@@ -1,0 +1,35 @@
+services:
+  runbook-agent:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      EXECUTION_MODE: ${EXECUTION_MODE:-dry-run}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      APPROVAL_TIMEOUT_MS: ${APPROVAL_TIMEOUT_MS:-300000}
+      PORT: "3000"
+    volumes:
+      # Persist incident history across container restarts.
+      - incident-data:/app/data
+      # Mount kubeconfig read-only for live mode (comment out for dry-run).
+      # - ${USERPROFILE}/.kube/config:/home/agent/.kube/config:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  incident-data:
