@@ -30,6 +30,8 @@ export function loadConfig(
     llmProvider: env["LLM_PROVIDER"],
     llmModel: env["LLM_MODEL"],
     llmApiKey: env[apiKeyEnvName],
+    llmBaseUrl: env["LLM_BASE_URL"] || undefined,
+    llmStructuredOutputs: env["LLM_STRUCTURED_OUTPUTS"],
     port: env["PORT"],
     executionMode: env["EXECUTION_MODE"],
     logLevel: env["LOG_LEVEL"],
