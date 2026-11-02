@@ -20,8 +20,11 @@ import type { Config } from "../config/schema.js";
 export function createLanguageModel(config: Config): LanguageModel {
   switch (config.llmProvider) {
     case "openai": {
-      const openai = createOpenAI({ apiKey: config.llmApiKey });
-      return openai(config.llmModel);
+      const openai = createOpenAI({
+        apiKey: config.llmApiKey,
+        ...(config.llmBaseUrl === undefined ? {} : { baseURL: config.llmBaseUrl }),
+      });
+      return openai(config.llmModel, { structuredOutputs: config.llmStructuredOutputs });
     }
     case "anthropic": {
       const anthropic = createAnthropic({ apiKey: config.llmApiKey });
