@@ -42,6 +42,22 @@ export const ConfigSchema = z.object({
   /** API key for the selected provider. Required, never logged. */
   llmApiKey: z.string().min(1, "LLM API key must not be empty"),
 
+  /**
+   * Base URL of an OpenAI-compatible endpoint (e.g. local Ollama at
+   * http://localhost:11434/v1). Unset means the provider's default.
+   */
+  llmBaseUrl: z.string().url().optional(),
+
+  /**
+   * Structured outputs (response_format json_schema) instead of tool calling for
+   * the triage decision. Needed for endpoints that ignore tool_choice, such as
+   * Ollama.
+   */
+  llmStructuredOutputs: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
+
   /** HTTP server port for the Alertmanager webhook. */
   port: z.coerce.number().int().min(1).max(65535).default(3000),
 

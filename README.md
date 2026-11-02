@@ -57,6 +57,9 @@ All configuration is validated at startup; the process fails fast with an aggreg
 | `LLM_MODEL`           | `gpt-4o`                | Model identifier for the selected provider   |
 | `OPENAI_API_KEY`      | —                       | Required when `LLM_PROVIDER=openai`          |
 | `ANTHROPIC_API_KEY`   | —                       | Required when `LLM_PROVIDER=anthropic`       |
+| `LLM_BASE_URL`        | —                       | OpenAI-compatible endpoint (e.g. Ollama `/v1`) |
+| `LLM_STRUCTURED_OUTPUTS` | `false`              | `json_schema` instead of tool calling (Ollama) |
+| `TRACEBLAME_ENABLED`  | —                       | `1`: TraceBlame tracing via `traceblame-ts`  |
 | `PORT`                | `3000`                  | Webhook server port                          |
 | `EXECUTION_MODE`      | `dry-run`               | `dry-run` (simulate) or `live` (execute)     |
 | `LOG_LEVEL`           | `info`                  | pino log level                               |

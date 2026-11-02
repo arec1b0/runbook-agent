@@ -11,6 +11,7 @@ import {
 import { nextStep, type TraceContext } from "../observability/trace.js";
 import type { ApprovalGate } from "./approval.gate.js";
 import { RollbackManager } from "./rollback.manager.js";
+import { toolSpan } from "../observability/aegis.js";
 
 /**
  * A planned step: action id plus raw (not yet validated) input.
@@ -120,7 +121,24 @@ export class ExecutionEngine {
    * @param rollbackManager - Rollback tracker for this plan run.
    * @returns Step outcome.
    */
-  private async executeStep(
+  private executeStep(
+    step: PlannedStep,
+    logger: Logger,
+    trace: TraceContext,
+    rollbackManager: RollbackManager
+  ): Promise<StepOutcome> {
+    // The whole step is one tool span: validation, the approval wait, execution.
+    return toolSpan(step.actionId, step.input, async (tool) => {
+      const outcome = await this.runStep(step, logger, trace, rollbackManager);
+      if (outcome.status !== "executed") {
+        tool.fail(outcome.status);
+      }
+      return outcome;
+    });
+  }
+
+  /** The safety chain of one step, inside executeStep's span. */
+  private async runStep(
     step: PlannedStep,
     logger: Logger,
     trace: TraceContext,

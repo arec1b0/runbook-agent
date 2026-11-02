@@ -34,5 +34,8 @@
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.24.0",
     "vitest": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "traceblame-ts": "github:arec1b0/traceblame#314e360b89f15c5a0e67c4ea4b7e55bb376c4a03&path:/sdk/ts"
   }
 }
