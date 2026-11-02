@@ -1,2 +1,6 @@
 allowBuilds:
   esbuild: false
+  # Pulled in by the shim's OTLP exporter; its postinstall only checks its own CLI's versions.
+  protobufjs: false
+  # traceblame-ts is git-hosted and builds itself on install (prepare: tsc); only the pinned commit may.
+  "traceblame-ts@https://codeload.github.com/arec1b0/traceblame/tar.gz/314e360b89f15c5a0e67c4ea4b7e55bb376c4a03#path:/sdk/ts": true
