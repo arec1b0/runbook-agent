@@ -17,6 +17,7 @@ import {
   type MetricsRegistry,
 } from "../observability/metrics.js";
 import { createTrace } from "../observability/trace.js";
+import { agentSpan, session } from "../observability/aegis.js";
 
 const HISTORY_LIMIT = 10;
 
@@ -48,6 +49,13 @@ export class AlertPipeline {
    * @returns The recorded incident.
    */
   async handle(alert: NormalizedAlert): Promise<IncidentRecord> {
+    return session(alert.id, () =>
+      agentSpan("runbook-agent", () => this.process(alert))
+    );
+  }
+
+  /** Handles the alert inside its session and the agent's span. */
+  private async process(alert: NormalizedAlert): Promise<IncidentRecord> {
     const trace = createTrace();
     const logger = this.logger.child({ traceId: trace.traceId });
     const startedAt = new Date().toISOString();

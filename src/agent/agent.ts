@@ -9,6 +9,7 @@ import {
   TRIAGE_SYSTEM_PROMPT,
   buildTriagePrompt,
 } from "./prompts/triage.prompt.js";
+import { telemetry } from "../observability/aegis.js";
 
 /**
  * Structured triage decision produced by the LLM.
@@ -72,6 +73,7 @@ export class TriageAgent {
         schema: TriageDecisionSchema,
         system: TRIAGE_SYSTEM_PROMPT,
         prompt: buildTriagePrompt(alert, candidates, history),
+        experimental_telemetry: telemetry(),
       });
       decision = response.object;
     } catch (error) {

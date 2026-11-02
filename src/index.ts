@@ -14,6 +14,7 @@ import { TriageAgent } from "./agent/agent.js";
 import { IncidentStore } from "./agent/memory/incident.store.js";
 import { AlertPipeline } from "./pipeline/alert.pipeline.js";
 import { buildServer } from "./server/http.server.js";
+import { setupTracing, shutdownTracing } from "./observability/aegis.js";
 
 /**
  * Composition root: the ONLY place where concrete implementations
@@ -21,6 +22,8 @@ import { buildServer } from "./server/http.server.js";
  * on interfaces and injected collaborators (DIP).
  */
 async function main(): Promise<void> {
+  // Tracing first, so every later module's spans have a provider.
+  const tracing = await setupTracing();
   const config = loadConfig();
   const logger = createLogger(config.logLevel);
   const metrics = createMetrics();
@@ -31,6 +34,7 @@ async function main(): Promise<void> {
       model: config.llmModel,
       mode: config.executionMode,
       port: config.port,
+      tracing,
     },
     "Starting runbook-agent"
   );
@@ -82,6 +86,7 @@ async function main(): Promise<void> {
   const shutdown = async (signal: string): Promise<void> => {
     logger.info({ signal }, "Shutting down");
     await server.close();
+    await shutdownTracing();
     process.exit(0);
   };
   process.on("SIGINT", () => void shutdown("SIGINT"));

@@ -2,6 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "ai";
 import type { Config } from "../config/schema.js";
+import { traced } from "../observability/aegis.js";
 
 /**
  * Creates a language model instance for the configured provider.
@@ -24,11 +25,13 @@ export function createLanguageModel(config: Config): LanguageModel {
         apiKey: config.llmApiKey,
         ...(config.llmBaseUrl === undefined ? {} : { baseURL: config.llmBaseUrl }),
       });
-      return openai(config.llmModel, { structuredOutputs: config.llmStructuredOutputs });
+      return traced(
+        openai(config.llmModel, { structuredOutputs: config.llmStructuredOutputs })
+      );
     }
     case "anthropic": {
       const anthropic = createAnthropic({ apiKey: config.llmApiKey });
-      return anthropic(config.llmModel);
+      return traced(anthropic(config.llmModel));
     }
   }
 }
